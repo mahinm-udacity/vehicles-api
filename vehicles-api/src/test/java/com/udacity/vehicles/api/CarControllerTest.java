@@ -93,14 +93,10 @@ public class CarControllerTest {
     @Test
     public void listCars() throws Exception {
         Car car = getCar();
-        car.setId(1L);
-        postCar(car);
-
         mvc.perform(get(new URI("/cars")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.carList", hasSize(1)))
                 .andExpect(jsonPath("$._embedded.carList[0].condition", is(car.getCondition().toString())))
-                .andExpect(jsonPath("$._embedded.carList[0].id", is(car.getId().intValue())))
                 .andExpect(jsonPath("$._embedded.carList[0].details.model", is(car.getDetails().getModel())));
     }
 
@@ -112,8 +108,6 @@ public class CarControllerTest {
     @Test
     public void findCar() throws Exception {
         Car car = getCar();
-        car.setId(1L);
-        postCar(car);
 
         mvc.perform(get(new URI("/cars/1")))
                 .andExpect(status().isOk())
@@ -124,17 +118,15 @@ public class CarControllerTest {
 
     /**
      * Tests the update operation for a car for a given id
+     *
      * @throws Exception if the update operation  fails
      */
     @Test
     public void updateCar() throws Exception {
 
         Car car = getCar();
-        car.setId(1L);
-        postCar(car);
-
         car.setCondition(Condition.NEW);
-        mvc.perform(put("/cars/{id}",1L)
+        mvc.perform(put("/cars/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.write(car).getJson())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -144,8 +136,6 @@ public class CarControllerTest {
 
     }
 
-
-
     /**
      * Tests the deletion of a single car by ID.
      *
@@ -153,23 +143,10 @@ public class CarControllerTest {
      */
     @Test
     public void deleteCar() throws Exception {
-        Car car = getCar();
-        car.setId(1L);
-        postCar(car);
-
         mvc.perform(
                 delete(new URI("/cars/1")))
                 .andExpect(status().is2xxSuccessful());
 
-    }
-
-
-    private void postCar(Car car) throws Exception {
-        mvc.perform(
-                post(new URI("/cars"))
-                        .content(json.write(car).getJson())
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8));
     }
 
     /**
